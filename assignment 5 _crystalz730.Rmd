@@ -1,0 +1,66 @@
+---
+title: "assignment 5"
+author: "Ting"
+date: "12/11/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+install.packages("rpart")
+install.packages("party")
+knitr::opts_chunk$set(echo = TRUE)
+library(rpart)
+library(party)
+D1 = read.csv("intelligent_tutor.csv")
+c.tree <- rpart(action ~ hint.y + complete, method="class", data=D1) #Notice the standard R notion for a formula X ~ Y
+
+#Look at the error of this tree
+printcp(c.tree)
+
+#Plot the tree
+post(c.tree, file = "tree.ps", title = "Session Completion Action: 1 - Ask teacher, 2 - Start new session, 3 - Give up")
+```
+
+Visulaize score data to decide "leaves"
+```{r}
+hist(D1$score)
+```
+
+
+Define "Leaves": 
+
+```{r}
+score<= 0.4 intervene, score between 0.4 and 0.8, monitor, core >= 0.8, no action. 
+Then generate the regression tree by using ctree. And plot.
+```
+```{r}
+D1$advice <- ifelse(D1$score <=0.4,"intervene", ifelse(D1$score > 0.4 & D1$score <=0.8, "monitor", "no action"))
+score_ctree <- ctree(factor(advice) ~ prior_prob_count + prior_percent_correct + hints, D1)
+plot(score_ctree)
+```
+
+
